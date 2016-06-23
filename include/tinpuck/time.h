@@ -20,5 +20,6 @@
 void tin_init_time(void);
 
 unsigned long tin_get_time(void);
+void tin_wait(unsigned long delta);
 
 #endif

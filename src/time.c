@@ -26,10 +26,16 @@ void tin_update_time(void) {
 
 void tin_init_time(void) {
     tin_task_register(&tin_time_task, tin_update_time, 10);
+    tin_task_activate(&tin_time_task);
 }
 
 unsigned long tin_get_time() {
     SYNCHRONIZED({
         return (unsigned long) tin_time;
     })
+}
+
+void tin_wait(unsigned long delta) {
+    unsigned long start = tin_get_time();
+    while (tin_get_time() - start < delta);
 }

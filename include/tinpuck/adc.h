@@ -19,4 +19,6 @@
 
 void tin_init_adc(void);
 
+void tin_get_proximity(unsigned int* proximity);
+
 #endif

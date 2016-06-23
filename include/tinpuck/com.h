@@ -19,4 +19,6 @@
 
 void tin_init_com(void);
 
+void tin_com_print(const char* message);
+
 #endif

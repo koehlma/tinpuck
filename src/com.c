@@ -1,4 +1,6 @@
-/*
+/**
+ * Tin-Puck Bluetooth Communication Subsystem
+ *
  * Copyright (C) 2016, Maximilian Köhl <mail@koehlma.de>
  *
  * This program is free software: you can redistribute it and/or modify it
@@ -43,6 +45,19 @@ void tin_init_com(void) {
     // enable TX
     U1STAbits.UTXEN = ON;
 }
+
+void tin_com_print(const char* message) {
+    while (*message) {
+        U1TXREG = (unsigned int) *message++;
+        while (!U1STAbits.TRMT);
+    }
+}
+
+/*
+
+void tin_com_send(TinComFuture* future) {
+
+}*/
 
 /*
 ISR(_U2RXInterrupt) {

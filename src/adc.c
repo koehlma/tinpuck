@@ -47,6 +47,8 @@
 #define SCAN_IR26 ((ADC_SCAN << IR2) | (ADC_SCAN << IR6))
 #define SCAN_IR37 ((ADC_SCAN << IR3) | (ADC_SCAN << IR7))
 
+static volatile unsigned int tin_buffer = 0;
+
 void tin_init_adc(void) {
     ADPCFGbits.PCFG8 = MODE_ANALOG;
     ADPCFGbits.PCFG9 = MODE_ANALOG;
@@ -77,7 +79,8 @@ void tin_init_adc(void) {
     // 2 cycles between acquisition and conversion
     ADCON3bits.SAMC = 1;
     // set sample rate to 12us
-    ADCON3bits.ADCS = 0b111;
+    //ADCON3bits.ADCS = 0b111;
+    A
 
     // clear ADC interrupt flag
     IFS0bits.ADIF = OFF;
@@ -93,8 +96,12 @@ void __attribute__((__interrupt__, auto_psv)) _ADCInterrupt (void) {
 
     IFS0bits.ADIF = 0;
 
-    ADCBUF0;
+    tin_buffer = ADCBUF0;
 
     proximity_number ^= 1;
     tin_set_led(0, proximity_number);
+}
+
+void tin_get_proximity(unsigned int* proximity) {
+    proximity[0] = tin_buffer;
 }
