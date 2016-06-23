@@ -28,7 +28,7 @@ void tin_init_time(void) {
     tin_task_register(&tin_time_task, tin_update_time, 10);
 }
 
-unsigned long e_get_time() {
+unsigned long tin_get_time() {
     SYNCHRONIZED({
         return (unsigned long) tin_time;
     })
