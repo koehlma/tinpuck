@@ -16,21 +16,7 @@
 
 #include "tinpuck.h"
 
-#define MICROPHONE_SAMPLE_FREQ 16384.0
-#define PROXIMITY_SAMPLE_FREQ 256.0
-
-#define PULSE_LENGTH 0.0003
-
-#define PROXIMITY_PERIOD (int) (MICROPHONE_SAMPLE_FREQ / PROXIMITY_SAMPLE_FREQ)
-#define PULSE_PERIOD (int) (PULSE_LENGTH * MICROPHONE_SAMPLE_FREQ)
-
-#define ADCS_2_CHANNEL (int) (2.0 * FCY / (MICROPHONE_SAMPLE_FREQ * (14 + 1) * 2) - 1)
-#define ADCS_3_CHANNEL (int) (2.0 * FCY / (MICROPHONE_SAMPLE_FREQ * (14 + 1) * 3) - 1)
-#define ADCS_4_CHANNEL (int) (2.0 * FCY / (MICROPHONE_SAMPLE_FREQ * (14 + 1) * 4) - 1)
-#define ADCS_5_CHANNEL (int) (2.0 * FCY / (MICROPHONE_SAMPLE_FREQ * (14 + 1) * 5) - 1)
-#define ADCS_6_CHANNEL (int) (2.0 * FCY / (MICROPHONE_SAMPLE_FREQ * (14 + 1) * 6) - 1)
-
-#define ADC_ISR_PERIOD_MS (1000.0 / MICROPHONE_SAMPLE_FREQ)
+#define SAMPLE_FREQ 3840.0
 
 #define MODE_ANALOG 0
 #define MODE_DIGITAL 1
@@ -123,9 +109,9 @@ void tin_init_adc(void) {
     ADCON2bits.SMPI = 8 - 1;
 
     // set automatic sample time
-    ADCON3bits.SAMC = 31;
-    // set conversion clock
-    ADCON3bits.ADCS = 31;
+    ADCON3bits.SAMC = 1;
+    // set conversion clock time
+    ADCON3bits.ADCS = (unsigned int) (2.0 * FCY / (SAMPLE_FREQ * (14 + 1) * 8) - 1);
 
     // clear ADC interrupt flag
     IFS0bits.ADIF = OFF;
@@ -158,6 +144,9 @@ void __attribute__((__interrupt__, auto_psv)) _ADCInterrupt (void) {
             state = 1;
             break;
         case 1:
+            state = 2;
+            break;
+        case 2:
             tin_proximity_reflection[0] = ADCBUF0;
             tin_proximity_reflection[1] = ADCBUF1;
             tin_proximity_reflection[2] = ADCBUF2;
