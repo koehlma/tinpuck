@@ -22,6 +22,7 @@ void tin_init(void) {
     tin_init_leds();
     tin_init_motors();
     tin_init_time();
+    tin_init_adc();
 
     ENABLE_INTERRUPTS();
 }

@@ -19,6 +19,12 @@
 
 void tin_init_adc(void);
 
+void tin_get_ir_ambient(unsigned int* ir_ambient);
+void tin_get_ir_reflection(unsigned int* ir_reflection);
+
+void tin_get_proximity_raw(unsigned int* proximity);
+
+void tin_calibrate_proximity();
 void tin_get_proximity(unsigned int* proximity);
 
 #endif
