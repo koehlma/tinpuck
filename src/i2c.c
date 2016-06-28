@@ -14,21 +14,23 @@
  * this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TIN_PUCK_H
-#define TIN_PUCK_H
+#include "tinpuck.h"
 
-#include "p30F6014A.h"
-
-#include "tinpuck/adc.h"
-#include "tinpuck/com.h"
-#include "tinpuck/core.h"
-#include "tinpuck/i2c.h"
-#include "tinpuck/leds.h"
-#include "tinpuck/motors.h"
-#include "tinpuck/rs232.h"
-#include "tinpuck/scheduler.h"
-#include "tinpuck/selector.h"
-#include "tinpuck/time.h"
-#include "tinpuck/utils.h"
-
-#endif
+void tin_init_i2c(void) {
+    // frequency of SCL at 100kHz
+    I2CBRG = 150;
+    // disable I2C
+    I2CCONbits.I2CEN = OFF;
+    // enable I2C
+    I2CCONbits.I2CEN = ON;
+    // clear master interrupt flag
+    IFS0bits.MI2CIF = 0;
+    // clear slave interrupt flag
+    IFS0bits.SI2CIF = 0;
+    // priority level
+    IPC3bits.MI2CIP = 5;
+    // enable master I2C interrupt
+	IEC0bits.MI2CIE = ON;
+    // disable slave I2C interrupt
+    IEC0bits.SI2CIE = ON;
+}

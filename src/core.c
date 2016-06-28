@@ -23,6 +23,7 @@ void tin_init(void) {
     tin_init_motors();
     tin_init_time();
     tin_init_adc();
+    tin_init_i2c();
 
     ENABLE_INTERRUPTS();
 }

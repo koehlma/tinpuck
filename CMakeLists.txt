@@ -26,6 +26,7 @@ set(SOURCE_FILES
         src/adc.c
         src/com.c
         src/core.c
+        src/i2c.c
         src/leds.c
         src/motors.c
         src/rs232.c
