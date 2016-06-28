@@ -18,15 +18,28 @@
 
 #include "tinpuck.h"
 
+#define TX_STATE_SOURCE 0
+#define TX_STATE_TARGET 1
+#define TX_STATE_COMMAND 2
+#define TX_STATE_LENGTH 3
+#define TX_STATE_DATA 4
+
+
 static unsigned char address = 0;
+
+static struct TinPackage* tx_queue = NULL;
+static unsigned int tx_state = TX_STATE_SOURCE;
+static unsigned int tx_position = 0;
+
+static TinPackage rx_package;
+static char rx_data[TIN_PACKAGE_MAX_LENGTH];
+
+
 
 unsigned char com_buffer[64];
 
 static unsigned int position = 0;
 
-static const char* trans_buffer;
-static unsigned int trans_position = 0;
-static unsigned int trans_complete = 0;
 
 void tin_init_com(void) {
     // reset to known state
@@ -55,22 +68,26 @@ void tin_init_com(void) {
 }
 
 void tin_com_print(const char* message) {
-    trans_buffer = message;
-    trans_position = 0;
-    trans_complete = 0;
-
-    // set interrupt flag
-    IFS0bits.U1TXIF = 1;
-    // enable TX interrupt
-    IEC0bits.U1TXIE = ON;
-
-    while (!trans_complete);
-
-    /*
     while (*message) {
         U1TXREG = (unsigned int) *message++;
         while (!U1STAbits.TRMT);
-    }*/
+    }
+}
+
+void tin_com_send(TinPackage* package) {
+    SYNCHRONIZED({
+        if (!tx_queue) {
+            tx_queue = package;
+            IFS0bits.U1TXIF = 1;
+            IEC0bits.U1TXIE = ON;
+        } else {
+            struct TinPackage* current = tx_queue;
+            while (current->next) {
+                current = current->next;
+            }
+            current->next = package;
+        }
+    })
 }
 
 ISR(_U1RXInterrupt) {
@@ -88,14 +105,42 @@ ISR(_U1RXInterrupt) {
 ISR(_U1TXInterrupt) {
     IFS0bits.U1TXIF = 0;
 
-    // TODO: implement packet transmission
-
-    if (trans_buffer[trans_position]) {
-        U1TXREG = (unsigned int) trans_buffer[trans_position];
-        trans_position++;
-    } else {
-        trans_complete = 1;
-        // disable TX interrupt
-        IEC0bits.U1TXIE = OFF;
+    switch (tx_state) {
+        case TX_STATE_SOURCE:
+            U1TXREG = (unsigned int) tx_queue->source;
+            tx_state = TX_STATE_TARGET;
+            break;
+        case TX_STATE_TARGET:
+            U1TXREG = (unsigned int) tx_queue->target;
+            tx_state = TX_STATE_COMMAND;
+            break;
+        case TX_STATE_COMMAND:
+            U1TXREG = (unsigned int) tx_queue->command;
+            tx_state = TX_STATE_LENGTH;
+            break;
+        case TX_STATE_LENGTH:
+            U1TXREG = tx_queue->length;
+            tx_state = TX_STATE_DATA;
+            break;
+        case TX_STATE_DATA:
+            if (tx_position < tx_queue->length) {
+                U1TXREG = (unsigned int) tx_queue->data[tx_position];
+                tx_position++;
+            } else {
+                if (tx_queue->callback) {
+                    tx_queue->callback(tx_queue);
+                }
+                tx_position = 0;
+                tx_state = TX_STATE_SOURCE;
+                if (tx_queue->next) {
+                    tx_queue = tx_queue->next;
+                } else {
+                    tx_queue = NULL;
+                    IEC0bits.U1TXIE = OFF;
+                }
+            }
+            break;
+        default:
+            break;
     }
 }

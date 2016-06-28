@@ -17,7 +17,27 @@
 #ifndef TIN_PUCK_COM_H
 #define TIN_PUCK_COM_H
 
+#ifndef TIN_PACKAGE_MAX_LENGTH
+#define TIN_PACKAGE_MAX_LENGTH 128
+#endif
+
+typedef struct TinPackage {
+    char source;
+    char target;
+    char command;
+
+    unsigned int length;
+    char *data;
+
+    void (*callback)(struct TinPackage*);
+
+    struct TinPackage* next;
+} TinPackage;
+
 void tin_init_com(void);
+
+void tin_com_register(char cmd, void (*callback)(TinPackage*));
+void tin_com_send(TinPackage* package);
 
 void tin_com_print(const char* message);
 
