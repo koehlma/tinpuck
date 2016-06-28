@@ -20,6 +20,14 @@
 
 static unsigned char address = 0;
 
+unsigned char com_buffer[64];
+
+static unsigned int position = 0;
+
+static const char* trans_buffer;
+static unsigned int trans_position = 0;
+static unsigned int trans_complete = 0;
+
 void tin_init_com(void) {
     // reset to known state
     U1MODE = 0;
@@ -34,10 +42,10 @@ void tin_init_com(void) {
     // set baudrate to 115200
     U1BRG = (unsigned int) ((FCY / ((float) 115200)) / 16.0 - 1);
 
-    // clear TX interrupt flag
-    IFS0bits.U1TXIF = 0;
-    // enable TX interrupt
-    //IEC0bits.U1TXIE = ON;
+    // clear RX interrupt flag
+    IFS0bits.U1RXIF = 0;
+    // enable RX interrupt
+    IEC0bits.U1RXIE = ON;
 
     // enable UART
     U1MODEbits.UARTEN = ON;
@@ -47,28 +55,47 @@ void tin_init_com(void) {
 }
 
 void tin_com_print(const char* message) {
+    trans_buffer = message;
+    trans_position = 0;
+    trans_complete = 0;
+
+    // set interrupt flag
+    IFS0bits.U1TXIF = 1;
+    // enable TX interrupt
+    IEC0bits.U1TXIE = ON;
+
+    while (!trans_complete);
+
+    /*
     while (*message) {
         U1TXREG = (unsigned int) *message++;
         while (!U1STAbits.TRMT);
+    }*/
+}
+
+ISR(_U1RXInterrupt) {
+    IFS0bits.U1RXIF = 0;
+
+    // TODO: implement packet handling
+
+    while (U1STAbits.URXDA) {
+        com_buffer[position] = U1RXREG;
+        position++;
+        position %= 64;
     }
 }
 
-/*
+ISR(_U1TXInterrupt) {
+    IFS0bits.U1TXIF = 0;
 
-void tin_com_send(TinComFuture* future) {
+    // TODO: implement packet transmission
 
-}*/
-
-/*
-ISR(_U2RXInterrupt) {
-    IFS1bits.U2RXIF = 0;
-
-    static bool state = 0;
-    state ^= 1;
-    e_set_led(0, 1);
+    if (trans_buffer[trans_position]) {
+        U1TXREG = (unsigned int) trans_buffer[trans_position];
+        trans_position++;
+    } else {
+        trans_complete = 1;
+        // disable TX interrupt
+        IEC0bits.U1TXIE = OFF;
+    }
 }
-
-ISR(_U2TXInterrupt) {
-    IFS1bits.U2TXIF = 0;
-}
-*/
