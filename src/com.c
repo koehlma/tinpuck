@@ -85,6 +85,7 @@ void tin_init_com(void) {
 
     // enable timeout scheduler
     tin_task_register(&timeout_task, tin_com_timeout, 100);
+    tin_task_activate(&timeout_task);
 }
 
 void tin_com_print(const char* message) {
