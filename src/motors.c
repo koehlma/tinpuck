@@ -45,7 +45,7 @@ static int tin_right_speed = 0;
 static TinTask tin_motor_left_task;
 static TinTask tin_motor_right_task;
 
-void tin_set_speed_left(int speed) {
+static void tin_set_speed_left(int speed) {
     MOTOR1_PHA_PORT = OFF;
     MOTOR1_PHB_PORT = OFF;
     MOTOR1_PHC_PORT = OFF;
@@ -71,7 +71,7 @@ void tin_set_speed_left(int speed) {
     }
 }
 
-void tin_set_speed_right(int speed) {
+static void tin_set_speed_right(int speed) {
     MOTOR2_PHA_PORT = OFF;
     MOTOR2_PHB_PORT = OFF;
     MOTOR2_PHC_PORT = OFF;
@@ -97,9 +97,34 @@ void tin_set_speed_right(int speed) {
     }
 }
 
-void tin_set_speed(int left, int right) {
-    tin_set_speed_left(left);
-    tin_set_speed_right(right);
+/* Don't know whether M_PI is properly pulled in */
+#ifndef M_PI
+/* Stolen from math.h ... yeah. */
+#define M_PI 3.14159265358979323846 /* pi */
+#endif
+
+/* From http://www.e-puck.org/index.php?option=com_content&view=article&id=7&Itemid=9
+ *
+ *     On the e-puck design we decided to use miniature steppers motors with
+ *     gear reduction. The motor has 20 steps per revolution and the gear
+ *     has a reduction of 50:1. The final axis is sufficiently strong to
+ *     support directly the wheel.
+ *
+ *     The wheels diameter is about 41 mm.  [Irrelevant things].
+ *     The maximum speed of the wheels is about 1000 steps / s,
+ *     which corresponds to one wheel revolution per second.
+ *
+ * So let's do math.  With a diameter of 41mm, the circumference is 4.1*pi/2 cm.
+ * A single step means movement by 4.1*pi/2000 cm.
+ * The tin_set_speed_left want the stepping frequency in Hz, or in other words:
+ *     4.1*pi/2000 cm/s
+ * So we just divide by this freaky constant.
+ */
+static const double STEPHZ_PER_CMS = 1 / (4.1 * M_PI / 2000);
+
+void tin_set_speed(double left, double right) {
+    tin_set_speed_left((int)(left * STEPHZ_PER_CMS));
+    tin_set_speed_right((int)(right * STEPHZ_PER_CMS));
 }
 
 void tin_update_left_phase(void) {
