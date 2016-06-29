@@ -30,7 +30,7 @@ static struct TinPackage* tx_queue = NULL;
 static unsigned int tx_state = STATE_SOURCE;
 static unsigned int tx_position = 0;
 
-TinPackage rx_package;
+static TinPackage rx_package;
 static char rx_data[TIN_PACKAGE_MAX_LENGTH];
 static char rx_state = STATE_SOURCE;
 static unsigned int rx_position = 0;
