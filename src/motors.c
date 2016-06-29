@@ -114,13 +114,13 @@ void tin_set_speed_right(int speed) {
  *     The maximum speed of the wheels is about 1000 steps / s,
  *     which corresponds to one wheel revolution per second.
  *
- * So let's do math.  With a diameter of 41mm, the circumference is 4.1*pi/2 cm.
- * A single step means movement by 4.1*pi/2000 cm.
- * The tin_set_speed_left want the stepping frequency in Hz, or in other words:
- *     4.1*pi/2000 cm/s
+ * So let's do math.  With a diameter of 41mm, the circumference is 4.1*pi cm.
+ * A single step means movement by 4.1*pi/1000 cm.
+ * The tin_set_speed_{left,right} want the stepping frequency in Hz, or in other words:
+ *     4.1*pi/1000 cm/s
  * So we just divide by this freaky constant.
  */
-static const double STEPHZ_PER_CMS = 1 / (4.1 * M_PI / 2000);
+static const double STEPHZ_PER_CMS = 1 / (4.1 * M_PI / 1000);
 
 void tin_set_speed(double left, double right) {
     tin_set_speed_left((int)(left * STEPHZ_PER_CMS));
