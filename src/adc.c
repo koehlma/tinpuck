@@ -34,16 +34,16 @@
 #define PROXIMITY_START (int) (BASE_SAMPLE_FREQ / 256.0)
 #define PROXIMITY_PULSE (int) (0.0003 * BASE_SAMPLE_FREQ)
 
-#define ADCS_2_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 2) -1)
-#define ADCS_3_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 3) -1)
-#define ADCS_4_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 4) -1)
-#define ADCS_5_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 5) -1)
-#define ADCS_6_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 6) -1)
-#define ADCS_7_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 7) -1)
-#define ADCS_8_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 8) -1)
-#define ADCS_9_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 9) -1)
-#define ADCS_10_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 10) -1)
-#define ADCS_11_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 11) -1)
+#define ADCS_2_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 2) - 1)
+#define ADCS_3_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 3) - 1)
+#define ADCS_4_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 4) - 1)
+#define ADCS_5_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 5) - 1)
+#define ADCS_6_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 6) - 1)
+#define ADCS_7_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 7) - 1)
+#define ADCS_8_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 8) - 1)
+#define ADCS_9_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 9) - 1)
+#define ADCS_10_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 10) - 1)
+#define ADCS_11_CHANNEL	(unsigned int) (2.0 * FCY / (BASE_SAMPLE_FREQ * (14 + 1) * 11) - 1)
 
 static int tin_proximity_ambient[8];
 static int tin_proximity_reflected[8];

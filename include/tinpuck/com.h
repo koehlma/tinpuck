@@ -21,7 +21,17 @@
 #define TIN_PACKAGE_MAX_LENGTH 128
 #endif
 
-typedef struct TinPackage {
+#ifndef TIN_PACKAGE_TIMEOUT
+#define TIN_PACKAGE_TIMEOUT 250
+#endif
+
+struct TinPackage;
+
+typedef struct TinPackage TinPackage;
+
+typedef void (*TinPackageCallback)(TinPackage* package);
+
+struct TinPackage {
     char source;
     char target;
     char command;
@@ -29,14 +39,14 @@ typedef struct TinPackage {
     unsigned int length;
     char *data;
 
-    void (*callback)(struct TinPackage*);
+    TinPackageCallback callback;
 
     struct TinPackage* next;
-} TinPackage;
+};
 
 void tin_init_com(void);
 
-void tin_com_register(char cmd, void (*callback)(TinPackage*));
+void tin_com_register(char command, TinPackageCallback callback);
 void tin_com_send(TinPackage* package);
 
 void tin_com_print(const char* message);
