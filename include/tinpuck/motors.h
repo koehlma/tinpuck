@@ -17,11 +17,8 @@
 #ifndef TIN_PUCK_MOTORS_H
 #define TIN_PUCK_MOTORS_H
 
-/*
-These functions do not convert between units.
 void tin_set_speed_left(int speed);
 void tin_set_speed_right(int speed);
-*/
 
 /* Units: cm/s */
 void tin_set_speed(double left, double right);

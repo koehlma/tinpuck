@@ -45,7 +45,7 @@ static int tin_right_speed = 0;
 static TinTask tin_motor_left_task;
 static TinTask tin_motor_right_task;
 
-static void tin_set_speed_left(int speed) {
+void tin_set_speed_left(int speed) {
     MOTOR1_PHA_PORT = OFF;
     MOTOR1_PHB_PORT = OFF;
     MOTOR1_PHC_PORT = OFF;
@@ -71,7 +71,7 @@ static void tin_set_speed_left(int speed) {
     }
 }
 
-static void tin_set_speed_right(int speed) {
+void tin_set_speed_right(int speed) {
     MOTOR2_PHA_PORT = OFF;
     MOTOR2_PHB_PORT = OFF;
     MOTOR2_PHC_PORT = OFF;
