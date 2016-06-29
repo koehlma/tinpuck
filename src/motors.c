@@ -45,6 +45,13 @@ static int tin_right_speed = 0;
 static TinTask tin_motor_left_task;
 static TinTask tin_motor_right_task;
 
+static int abs(int value) {
+    if (value < 0) {
+        return value * -1;
+    }
+    return value;
+}
+
 void tin_set_speed_left(int speed) {
     MOTOR1_PHA_PORT = OFF;
     MOTOR1_PHB_PORT = OFF;
@@ -127,6 +134,11 @@ void tin_set_speed(double left, double right) {
     tin_set_speed_right((int)(right * STEPHZ_PER_CMS));
 }
 
+
+#if TIN_MOTORS_MAX_V <= TIN_MOTORS_THRESHOLD_V
+#error TIN_MOTORS_MAX_V must be higher than TIN_MOTORS_THRESHOLD_V
+#endif
+
 void tin_update_left_phase(void) {
     switch (tin_left_motor_phase) {
         case 0:
@@ -154,6 +166,7 @@ void tin_update_left_phase(void) {
             MOTOR1_PHD_PORT = ON;
             break;
     }
+
 }
 
 void tin_update_right_phase(void) {
@@ -186,6 +199,16 @@ void tin_update_right_phase(void) {
 }
 
 void tin_run_motor_left(void) {
+    /*static unsigned int on = 0;
+    if(on && abs(tin_left_speed) < TIN_MOTORS_THRESHOLD_V) {
+        MOTOR1_PHA_PORT = OFF;
+        MOTOR1_PHB_PORT = OFF;
+        MOTOR1_PHC_PORT = OFF;
+        MOTOR1_PHD_PORT = OFF;
+        on = 0;
+        tin_task_set_period(&tin_motor_left_task, (unsigned int) 10000 / abs(tin_left_speed) - 10000 / TIN_MOTORS_MAX_V);
+        return;
+    }*/
     if (tin_left_speed > 0) {
         tin_left_motor_phase--;
         if (tin_left_motor_phase < 0) tin_left_motor_phase = 3;
@@ -194,9 +217,24 @@ void tin_run_motor_left(void) {
         if (tin_left_motor_phase > 3) tin_left_motor_phase = 0;
     }
     tin_update_left_phase();
+    /*
+    if(abs(tin_left_speed) < TIN_MOTORS_THRESHOLD_V) {
+        on = 1;
+        tin_task_set_period(&tin_motor_left_task, 10000 / TIN_MOTORS_MAX_V);
+    }*/
 }
 
 void tin_run_motor_right(void) {
+    /*static unsigned int on = 0;
+    if(on && abs(tin_right_speed) < TIN_MOTORS_THRESHOLD_V) {
+        MOTOR1_PHA_PORT = OFF;
+        MOTOR1_PHB_PORT = OFF;
+        MOTOR1_PHC_PORT = OFF;
+        MOTOR1_PHD_PORT = OFF;
+        on = 0;
+        tin_task_set_period(&tin_motor_right_task, (unsigned int) 10000 / abs(tin_right_speed) - 10000 / TIN_MOTORS_MAX_V);
+        return;
+    }*/
     if (tin_right_speed < 0) {
         tin_right_motor_phase--;
         if (tin_right_motor_phase < 0) tin_right_motor_phase = 3;
@@ -205,6 +243,11 @@ void tin_run_motor_right(void) {
         if (tin_right_motor_phase > 3) tin_right_motor_phase = 0;
     }
     tin_update_right_phase();
+    /*
+    if(abs(tin_right_speed) < TIN_MOTORS_THRESHOLD_V) {
+        on = 1;
+        tin_task_set_period(&tin_motor_right_task, 10000 / TIN_MOTORS_MAX_V);
+    }*/
 }
 
 void tin_init_motors(void) {

@@ -20,6 +20,14 @@
 void tin_set_speed_left(int speed);
 void tin_set_speed_right(int speed);
 
+#ifndef TIN_MOTORS_MAX_V
+#define TIN_MOTORS_MAX_V 650
+#endif
+
+#ifndef TIN_MOTORS_THRESHOLD_V
+#define TIN_MOTORS_THRESHOLD_V 601
+#endif
+
 /* Units: cm/s */
 void tin_set_speed(double left, double right);
 
