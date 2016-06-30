@@ -24,9 +24,8 @@
 #define STATE_LENGTH 3
 #define STATE_DATA 4
 
-static unsigned char address = 0;
-
 static struct TinPackage* tx_queue = NULL;
+static unsigned char tx_address = 0;
 static unsigned int tx_state = STATE_SOURCE;
 static unsigned int tx_position = 0;
 
@@ -95,7 +94,14 @@ void tin_com_print(const char* message) {
     }
 }
 
+void tin_com_set_address(unsigned int address) {
+    tx_address = (unsigned char) address;
+}
+
 void tin_com_send(TinPackage* package) {
+    if (!package->source) {
+        package->source = tx_address;
+    }
     SYNCHRONIZED({
         if (!tx_queue) {
             tx_queue = package;
@@ -104,7 +110,13 @@ void tin_com_send(TinPackage* package) {
         } else {
             struct TinPackage* current = tx_queue;
             while (current->next) {
+                if (current == package) {
+                    return;
+                }
                 current = current->next;
+            }
+            if (current == package) {
+                return;
             }
             current->next = package;
         }

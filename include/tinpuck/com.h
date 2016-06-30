@@ -46,6 +46,7 @@ struct TinPackage {
 
 void tin_init_com(void);
 
+void tin_com_set_address(unsigned int address);
 void tin_com_register(char command, TinPackageCallback callback);
 void tin_com_send(TinPackage* package);
 
