@@ -41,6 +41,8 @@ struct TinPackage {
 
     TinPackageCallback callback;
 
+    unsigned int completed;
+
     struct TinPackage* next;
 };
 

@@ -99,6 +99,7 @@ void tin_com_set_address(unsigned int address) {
 }
 
 void tin_com_send(TinPackage* package) {
+    package->completed = 0;
     if (!package->source) {
         package->source = tx_address;
     }
@@ -205,6 +206,7 @@ ISR(_U1TXInterrupt) {
                     tx_queue = NULL;
                     IEC0bits.U1TXIE = OFF;
                 }
+                package->completed = 1;
                 if (package->callback) {
                     package->callback(package);
                 }
@@ -224,6 +226,7 @@ ISR(_U1TXInterrupt) {
                     tx_queue = NULL;
                     IEC0bits.U1TXIE = OFF;
                 }
+                package->completed = 1;
                 if (package->callback) {
                     package->callback(package);
                 }
