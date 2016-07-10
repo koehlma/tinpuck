@@ -30,7 +30,23 @@ static unsigned int tx_state = STATE_SOURCE;
 static unsigned int tx_position = 0;
 
 static TinPackage rx_package;
+
+/* By default, make rx_data 2-byte aligned, so that 'int16' accesses on
+ * even offsets are guaranteed to work.
+ * If you need higher alignment, set TINPUCK_COM_RX_ALIGN.
+ * If you don't want this at all, set TINPUCK_COM_RX_ALIGN_NONE.
+ *
+ * As this only introduces an additional guarantee, this is backwards-compatible,
+ * and consumes at most 1 byte more (and only if xc16 is totally insane). */
+#ifdef TINPUCK_COM_RX_ALIGN_NONE
 static char rx_data[TIN_PACKAGE_MAX_LENGTH];
+#else
+#  ifndef TINPUCK_COM_RX_ALIGN
+#  define TINPUCK_COM_RX_ALIGN 2
+#  endif
+static char rx_data[TIN_PACKAGE_MAX_LENGTH] __attribute__ ((aligned (TINPUCK_COM_RX_ALIGN)));
+#endif
+
 static char rx_state = STATE_SOURCE;
 static unsigned int rx_position = 0;
 static unsigned long rx_start = 0;
