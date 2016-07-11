@@ -37,6 +37,7 @@ struct TinPackage {
     char command;
 
     unsigned int length;
+
     char *data;
 
     TinPackageCallback callback;

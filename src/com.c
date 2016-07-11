@@ -42,7 +42,7 @@ static TinPackage rx_package;
 static char rx_data[TIN_PACKAGE_MAX_LENGTH];
 #else
 #  ifndef TINPUCK_COM_RX_ALIGN
-#  define TINPUCK_COM_RX_ALIGN 2
+#  define TINPUCK_COM_RX_ALIGN 4
 #  endif
 static char rx_data[TIN_PACKAGE_MAX_LENGTH] __attribute__ ((aligned (TINPUCK_COM_RX_ALIGN)));
 #endif
@@ -174,7 +174,7 @@ ISR(_U1RXInterrupt) {
                 }
                 break;
             case STATE_DATA:
-                rx_package.data[(unsigned int)rx_position] = U1RXREG;
+                rx_package.data[rx_position] = U1RXREG;
                 rx_position++;
                 if (rx_position >= rx_package.length) {
                     rx_position = 0;
@@ -230,7 +230,7 @@ ISR(_U1TXInterrupt) {
             break;
         case STATE_DATA:
             if (tx_position < tx_queue->length) {
-                U1TXREG = (unsigned int) tx_queue->data[(unsigned int)tx_position];
+                U1TXREG = (unsigned int) tx_queue->data[tx_position];
                 tx_position++;
             } else {
                 package = tx_queue;
