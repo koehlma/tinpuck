@@ -16,10 +16,10 @@
 
 #include "tinpuck.h"
 
-_FOSC(CSW_FSCM_OFF & XT_PLL8);
-_FWDT(WDT_OFF);
-_FBORPOR(PBOR_OFF & MCLR_EN);
-_FGS(CODE_PROT_OFF);
+_FOSC(CSW_FSCM_OFF & XT_PLL8)
+_FWDT(WDT_OFF)
+_FBORPOR(PBOR_OFF & MCLR_EN)
+_FGS(CODE_PROT_OFF)
 
 void tin_enable_interrupts() {
     ENABLE_INTERRUPTS();

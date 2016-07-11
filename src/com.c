@@ -141,7 +141,7 @@ void tin_com_send(TinPackage* package) {
 }
 
 void tin_com_register(char command, TinPackageCallback callback) {
-    rx_callbacks[command] = callback;
+    rx_callbacks[(unsigned int)command] = callback;
 }
 
 ISR(_U1RXInterrupt) {
@@ -168,19 +168,19 @@ ISR(_U1RXInterrupt) {
                 if (rx_package.length < 1) {
                     rx_position = 0;
                     rx_state = STATE_SOURCE;
-                    if (rx_callbacks[rx_package.command]) {
-                        rx_callbacks[rx_package.command](&rx_package);
+                    if (rx_callbacks[(unsigned int)rx_package.command]) {
+                        rx_callbacks[(unsigned int)rx_package.command](&rx_package);
                     }
                 }
                 break;
             case STATE_DATA:
-                rx_package.data[rx_position] = U1RXREG;
+                rx_package.data[(unsigned int)rx_position] = U1RXREG;
                 rx_position++;
                 if (rx_position >= rx_package.length) {
                     rx_position = 0;
                     rx_state = STATE_SOURCE;
-                    if (rx_callbacks[rx_package.command]) {
-                        rx_callbacks[rx_package.command](&rx_package);
+                    if (rx_callbacks[(unsigned int)rx_package.command]) {
+                        rx_callbacks[(unsigned int)rx_package.command](&rx_package);
                     }
                 }
                 break;
@@ -230,7 +230,7 @@ ISR(_U1TXInterrupt) {
             break;
         case STATE_DATA:
             if (tx_position < tx_queue->length) {
-                U1TXREG = (unsigned int) tx_queue->data[tx_position];
+                U1TXREG = (unsigned int) tx_queue->data[(unsigned int)tx_position];
                 tx_position++;
             } else {
                 package = tx_queue;
