@@ -31,6 +31,8 @@ void tin_set_speed_right(int speed);
 /* Units: cm/s */
 void tin_set_speed(double left, double right);
 
+void tin_set_motors_powersafe(unsigned int enabled);
+
 void tin_init_motors(void);
 
 #endif
