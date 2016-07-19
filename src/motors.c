@@ -39,7 +39,7 @@
 static volatile int tin_left_motor_phase = 0;
 static volatile int tin_right_motor_phase = 0;
 
-static volatile unsigned int tin_motors_powersafe = 1;
+static volatile unsigned int tin_motors_powersave = 1;
 
 static int tin_left_speed = 0;
 static int tin_right_speed = 0;
@@ -54,8 +54,8 @@ static int abs(int value) {
     return value;
 }
 
-void tin_set_motors_powersafe(unsigned int enabled) {
-    tin_motors_powersafe = 1;
+void tin_set_motors_powersave(unsigned int enabled) {
+    tin_motors_powersave = 1;
 }
 
 void tin_set_speed_left(int speed) {
@@ -223,7 +223,7 @@ void tin_run_motor_left(void) {
         if (tin_left_motor_phase > 3) tin_left_motor_phase = 0;
     }
     tin_update_left_phase();
-    if(abs(tin_left_speed) < TIN_MOTORS_THRESHOLD_V && tin_motors_powersafe) {
+    if(abs(tin_left_speed) < TIN_MOTORS_THRESHOLD_V && tin_motors_powersave) {
         on = 1;
         tin_task_set_period(&tin_motor_left_task, 10000 / TIN_MOTORS_MAX_V);
     }
@@ -248,7 +248,7 @@ void tin_run_motor_right(void) {
         if (tin_right_motor_phase > 3) tin_right_motor_phase = 0;
     }
     tin_update_right_phase();
-    if(abs(tin_right_speed) < TIN_MOTORS_THRESHOLD_V && tin_motors_powersafe) {
+    if(abs(tin_right_speed) < TIN_MOTORS_THRESHOLD_V && tin_motors_powersave) {
         on = 1;
         tin_task_set_period(&tin_motor_right_task, 10000 / TIN_MOTORS_MAX_V);
     }
