@@ -213,6 +213,9 @@ ISR(_U1TXInterrupt) {
             if (tx_queue->length) {
                 tx_state = STATE_DATA;
             } else {
+                // disable nested interrupts
+                INTCON1bits.NSTDIS = ON;
+
                 package = tx_queue;
                 tx_position = 0;
                 tx_state = STATE_SOURCE;
@@ -226,6 +229,9 @@ ISR(_U1TXInterrupt) {
                 if (package->callback) {
                     package->callback(package);
                 }
+
+                // enable nested interrupts
+                INTCON1bits.NSTDIS = OFF;
             }
             break;
         case STATE_DATA:
@@ -233,6 +239,9 @@ ISR(_U1TXInterrupt) {
                 U1TXREG = (unsigned int) tx_queue->data[tx_position];
                 tx_position++;
             } else {
+                // disable nested interrupts
+                INTCON1bits.NSTDIS = ON;
+
                 package = tx_queue;
                 tx_position = 0;
                 tx_state = STATE_SOURCE;
@@ -246,6 +255,9 @@ ISR(_U1TXInterrupt) {
                 if (package->callback) {
                     package->callback(package);
                 }
+
+                // enable nested interrupts
+                INTCON1bits.NSTDIS = OFF;
             }
             break;
         default:
