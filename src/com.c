@@ -24,10 +24,10 @@
 #define STATE_LENGTH 3
 #define STATE_DATA 4
 
-static struct TinPackage* tx_queue = NULL;
-static unsigned char tx_address = 0;
-static unsigned int tx_state = STATE_SOURCE;
-static unsigned int tx_position = 0;
+static volatile struct TinPackage* tx_queue = NULL;
+static volatile unsigned char tx_address = 0;
+static volatile unsigned int tx_state = STATE_SOURCE;
+static volatile unsigned int tx_position = 0;
 
 static TinPackage rx_package;
 
@@ -126,7 +126,7 @@ void tin_com_send(TinPackage* package) {
             IFS0bits.U1TXIF = 1;
             IEC0bits.U1TXIE = ON;
         } else {
-            struct TinPackage* current = tx_queue;
+            struct TinPackage* current = (TinPackage*) tx_queue;
             while (current->next) {
                 if (current == package) {
                     return;
@@ -171,7 +171,9 @@ ISR(_U1RXInterrupt) {
                     rx_position = 0;
                     rx_state = STATE_SOURCE;
                     if (rx_callbacks[(unsigned int)rx_package.command]) {
+                        //tin_print("RX:BC\n");
                         rx_callbacks[(unsigned int)rx_package.command](&rx_package);
+                        //tin_print("RX:EC\n");
                     }
                 }
                 break;
@@ -182,7 +184,9 @@ ISR(_U1RXInterrupt) {
                     rx_position = 0;
                     rx_state = STATE_SOURCE;
                     if (rx_callbacks[(unsigned int)rx_package.command]) {
+                        //tin_print("RX:BC\n");
                         rx_callbacks[(unsigned int)rx_package.command](&rx_package);
+                        //tin_print("RX:EC\n");
                     }
                 }
                 break;
@@ -196,6 +200,8 @@ ISR(_U1TXInterrupt) {
     IFS0bits.U1TXIF = 0;
 
     TinPackage* package;
+
+    // tin_print("ISR:TX\n");
 
     switch (tx_state) {
         case STATE_SOURCE:
@@ -215,7 +221,7 @@ ISR(_U1TXInterrupt) {
             if (tx_queue->length) {
                 tx_state = STATE_DATA;
             } else {
-                package = tx_queue;
+                package = (TinPackage*) tx_queue;
                 tx_position = 0;
                 tx_state = STATE_SOURCE;
                 if (tx_queue->next) {
@@ -224,6 +230,7 @@ ISR(_U1TXInterrupt) {
                     tx_queue = NULL;
                     IEC0bits.U1TXIE = OFF;
                 }
+                tin_print("TX:C\n");
                 package->completed = 1;
                 if (package->callback) {
                     package->callback(package);
@@ -235,7 +242,7 @@ ISR(_U1TXInterrupt) {
                 U1TXREG = (unsigned int) tx_queue->data[tx_position];
                 tx_position++;
             } else {
-                package = tx_queue;
+                package = (TinPackage*) tx_queue;
                 tx_position = 0;
                 tx_state = STATE_SOURCE;
                 if (tx_queue->next) {
@@ -245,6 +252,7 @@ ISR(_U1TXInterrupt) {
                     IEC0bits.U1TXIE = OFF;
                 }
                 package->completed = 1;
+                //tin_print("TX:C\n");
                 if (package->callback) {
                     package->callback(package);
                 }
