@@ -32,8 +32,6 @@ void tin_init_rs232(unsigned long baudrate) {
 
     // clear TX interrupt flag
     IFS1bits.U2TXIF = 0;
-    // enable TX interrupt
-    //IEC1bits.U2TXIE = ON;
 
     // enable UART
     U2MODEbits.UARTEN = ON;
@@ -42,10 +40,9 @@ void tin_init_rs232(unsigned long baudrate) {
     U2STAbits.UTXEN = ON;
 }
 
-/*
-ISR(_U2TXInterrupt) {
-    IFS1bits.U2TXIF = 0;
-    static unsigned int state = 0;
-    state ^= 1;
-    e_set_led(5, state);
-}*/
+void tin_print(const char* message) {
+    while (*message) {
+        U2TXREG = (unsigned int) *message;
+        while (!U2STAbits.TRMT);
+    }
+}

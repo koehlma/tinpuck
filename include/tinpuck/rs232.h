@@ -19,4 +19,6 @@
 
 void tin_init_rs232(unsigned long);
 
+void tin_print(const char* message);
+
 #endif
