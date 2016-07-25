@@ -24,7 +24,7 @@
 #define STATE_LENGTH 3
 #define STATE_DATA 4
 
-static struct TinPackage* tx_queue = NULL;
+static volatile struct TinPackage* tx_queue = NULL;
 static unsigned char tx_address = 0;
 static unsigned int tx_state = STATE_SOURCE;
 static unsigned int tx_position = 0;
@@ -126,7 +126,7 @@ void tin_com_send(TinPackage* package) {
             IFS0bits.U1TXIF = 1;
             IEC0bits.U1TXIE = ON;
         } else {
-            struct TinPackage* current = tx_queue;
+            struct TinPackage* current = (TinPackage*) tx_queue;
             while (current->next) {
                 if (current == package) {
                     return;
@@ -212,30 +212,17 @@ ISR(_U1TXInterrupt) {
             break;
         case STATE_LENGTH:
             U1TXREG = tx_queue->length;
+            tx_position = 0;
             if (tx_queue->length) {
                 tx_state = STATE_DATA;
-            } else {
-                package = tx_queue;
-                tx_position = 0;
-                tx_state = STATE_SOURCE;
-                if (tx_queue->next) {
-                    tx_queue = tx_queue->next;
-                } else {
-                    tx_queue = NULL;
-                    IEC0bits.U1TXIE = OFF;
-                }
-                package->completed = 1;
-                if (package->callback) {
-                    package->callback(package);
-                }
+                break;
             }
-            break;
         case STATE_DATA:
             if (tx_position < tx_queue->length) {
                 U1TXREG = (unsigned int) tx_queue->data[tx_position];
                 tx_position++;
             } else {
-                package = tx_queue;
+                package = (TinPackage*) tx_queue;
                 tx_position = 0;
                 tx_state = STATE_SOURCE;
                 if (tx_queue->next) {
