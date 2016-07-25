@@ -44,5 +44,6 @@ void tin_print(const char* message) {
     while (*message) {
         U2TXREG = (unsigned int) *message;
         while (!U2STAbits.TRMT);
+        message++;
     }
 }
