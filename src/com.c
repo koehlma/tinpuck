@@ -227,6 +227,7 @@ ISR(_U1TXInterrupt) {
                 tx_state = STATE_SOURCE;
                 if (tx_queue->next) {
                     tx_queue = tx_queue->next;
+                    IFS0bits.U1TXIF = 1;
                 } else {
                     tx_queue = NULL;
                     IEC0bits.U1TXIE = OFF;
