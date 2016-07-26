@@ -38,14 +38,14 @@ static TinPackage rx_package;
  *
  * As this only introduces an additional guarantee, this is backwards-compatible,
  * and consumes at most 1 byte more (and only if xc16 is totally insane). */
-#ifdef TINPUCK_COM_RX_ALIGN_NONE
-static char rx_data[TIN_PACKAGE_MAX_LENGTH];
-#else
+static char rx_data[TIN_PACKAGE_MAX_LENGTH]
+#ifndef TINPUCK_COM_RX_ALIGN_NONE
 #  ifndef TINPUCK_COM_RX_ALIGN
 #  define TINPUCK_COM_RX_ALIGN 4
 #  endif
-static char rx_data[TIN_PACKAGE_MAX_LENGTH] __attribute__ ((aligned (TINPUCK_COM_RX_ALIGN)));
+    __attribute__ ((aligned (TINPUCK_COM_RX_ALIGN)))
 #endif
+    ;
 
 static char rx_state = STATE_SOURCE;
 static unsigned int rx_position = 0;
